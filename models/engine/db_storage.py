@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 """Database storage"""
-import json
 from models.base_model import BaseModel, Base
 from models.user import User
 from models.state import State
@@ -11,6 +10,7 @@ from models.review import Review
 from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+
 
 class DBStorage:
     """ Database storage
@@ -37,9 +37,22 @@ class DBStorage:
         Return:
             returns a dictionary of __object
         """
+        dictionary = {}
         if not cls:
-            return self.__session
-        return self.__session.query(cls).all()
+            objects = self.__session.query(cls).all()
+        else:
+            objects = self.__session.query(
+                User,
+                State,
+                City,
+                Amenity,
+                Place,
+                Review
+            )
+        for obj in objects:
+            key = type(obj).__name__ + '.' + obj.id
+            dictionary[key] = obj
+        return dictionary
 
     def new(self, obj):
         """sets __object to given obj
