@@ -30,3 +30,14 @@ class User(BaseModel, Base):
         String(128),
         nullable=False
     )
+
+
+
+
+
+
+    reviews = relationship(
+        "Review",
+        backref="user",
+        cascade="all, delete-orphan"
+    )
