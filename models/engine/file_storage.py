@@ -59,11 +59,13 @@ class FileStorage:
                 for key, value in (json.load(f)).items():
                     value = eval(value["__class__"])(**value)
                     self.__objects[key] = value
-        except FileNotFoundError:
+        except OSError:
             pass
 
     def delete(self, obj=None):
         """Deletes obj from __objects"""
         if obj:
             key = "{}.{}".format(type(obj).__name__, obj.id)
-        del self.__objects[key]
+            if key in self.__objects:
+                del self.__objects[key]
+        self.save()

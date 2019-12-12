@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 """This is the state class"""
 from models.base_model import BaseModel, Base
+from models.city import City
+import models
 from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+from os import getenv
+
 
 class State(BaseModel, Base):
     """This is the class for State
@@ -14,3 +19,17 @@ class State(BaseModel, Base):
         String(128),
         nullable=False
     )
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        cities = relationship(
+            'City',
+            backref='state',
+            cascade='all, delete-orphan'
+        )
+    else:
+        @property
+        def cities(self):
+            city_list = []
+            for id, city in models.storage.all(City).items():
+                if self.id == city.state.id:
+                    city_list.append(city)
+            return city_list
