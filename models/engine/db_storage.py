@@ -42,7 +42,7 @@ class DBStorage:
             objects = self.__session.query(cls).all()
         else:
             objects = []
-            for _class in [State, City, User, Place]:
+            for _class in [State, City, User, Place, Review]:
                 for obj in self.__session.query(_class):
                     objects.append(obj)
         for obj in objects:
