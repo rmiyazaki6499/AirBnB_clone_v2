@@ -53,6 +53,7 @@ def do_deploy(archive_path):
 
     return True
 
+
 def deploy():
     """Deploy to all servers"""
     file = do_pack()
