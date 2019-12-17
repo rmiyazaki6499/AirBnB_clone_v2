@@ -24,9 +24,9 @@ class User(BaseModel, Base):
     )
     first_name = Column(
         String(128),
-        nullable=False
+        nullable=True
     )
     last_name = Column(
         String(128),
-        nullable=False
+        nullable=True
     )
