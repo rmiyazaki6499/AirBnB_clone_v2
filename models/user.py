@@ -2,7 +2,7 @@
 """This is the user class"""
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
-
+from sqlalchemy.orm import relationship
 
 class User(BaseModel, Base):
     """This is the class for user
@@ -24,9 +24,15 @@ class User(BaseModel, Base):
     )
     first_name = Column(
         String(128),
-        nullable=False
+        nullable=True
     )
     last_name = Column(
         String(128),
-        nullable=False
+        nullable=True
+    )
+
+    places = relationship(
+        "Place",
+        backref="user",
+        cascade="all, delete-orphan"
     )
