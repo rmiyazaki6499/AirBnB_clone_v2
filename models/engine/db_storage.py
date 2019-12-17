@@ -38,17 +38,13 @@ class DBStorage:
             returns a dictionary of __object
         """
         dictionary = {}
-        if not cls:
+        if cls:
             objects = self.__session.query(cls).all()
         else:
-            objects = self.__session.query(
-                User,
-                State,
-                City,
-                Amenity,
-                Place,
-                Review
-            )
+            objects = []
+            for _class in [State, City]:
+                for obj in self.__session.query(_class):
+                    objects.append(obj)
         for obj in objects:
             key = type(obj).__name__ + '.' + obj.id
             dictionary[key] = obj
