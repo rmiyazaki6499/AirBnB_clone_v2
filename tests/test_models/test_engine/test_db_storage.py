@@ -35,8 +35,18 @@ class TestDBStorage(unittest.TestCase):
     def test_pep8_DBStorage(self):
         """Tests pep8 style"""
         style = pep8.StyleGuide(quiet=True)
-        p = style.check_files(['models/engine/file_storage.py'])
+        p = style.check_files(['models/engine/db_storage.py'])
         self.assertEqual(p.total_errors, 0, "fix pep8")
+
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db', 'db')
+    def test_all(self):
+        storage = DBStorage()
+        storage.reload()
+        old = len(storage.all())
+        State(name="CA").save()
+        storage.save()
+        new = len(storage.all())
+        self.assertIs(new, old + 1)
 
 if __name__ == "__main__":
     unittest.main()
