@@ -13,9 +13,10 @@ class TestCity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """set up for test"""
-        cls.city = City()
-        cls.city.name = "LA"
-        cls.city.state_id = "CA"
+        state = State(name="California")
+        state.save()
+        city = City(state_id=state.id, name="LA")
+        city.save()
 
     @classmethod
     def teardown(cls):
@@ -56,6 +57,7 @@ class TestCity(unittest.TestCase):
         self.assertEqual(type(self.city.name), str)
         self.assertEqual(type(self.city.state_id), str)
 
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db', 'db')
     def test_save_City(self):
         """test if the save works"""
         self.city.save()
