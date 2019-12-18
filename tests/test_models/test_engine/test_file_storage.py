@@ -91,6 +91,20 @@ class TestFileStorage(unittest.TestCase):
                 self.assertEqual(line, "{}")
         self.assertIs(self.storage.reload(), None)
 
+    def test_delete(self):
+        storage = FileStorage()
+        city = City()
+        storage.new(city)
+        storage.save()
+        storage.delete(city)
+        self.assertNotIn(city, storage.all(City).values())
+
+    def test_all(self):
+        storage = FileStorage()
+        city = City()
+        storage.new(city)
+        storage.save()
+        self.assertIn(city, storage.all(City))
 
 if __name__ == "__main__":
     unittest.main()
