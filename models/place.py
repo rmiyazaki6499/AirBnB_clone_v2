@@ -9,7 +9,7 @@ from os import getenv
 
 
 place_amenity = Table(
-    "place_amenity",
+    'place_amenity',
     Base.metadata,
     Column(
         'place_id',
@@ -43,7 +43,7 @@ class Place(BaseModel, Base):
         longitude: longitude in float
         amenity_ids: list of Amenity ids
     """
-    __tablename__ = "places"
+    __tablename__ = 'places'
 
     city_id = Column(
         String(60),
@@ -92,15 +92,20 @@ class Place(BaseModel, Base):
         nullable=True
     )
 
-    reviews = relationship(
-        'Review',
-        backref='place',
-        cascade='all, delete-orphan'
-    )
-
     amenity_ids = []
 
     if getenv('HBNB_TYPE_STORAGE') == 'db':
+        reviews = relationship(
+            'Review',
+            backref='place',
+            cascade='all, delete-orphan'
+        )
+        amenities = relationship(
+            'Amenity',
+            secondary='place_amenity',
+            viewonly='False',
+        )
+    else:
         @property
         def reviews(self):
             review_list = []
@@ -109,13 +114,6 @@ class Place(BaseModel, Base):
                     review_list.append(review)
             return review_list
 
-        amenities = relationship(
-            'Amenity',
-            secondary='place_amenity',
-            viewonly='False',
-            backref='place'
-        )
-    else:
         @property
         def amenities(self):
             amenities_list = []
