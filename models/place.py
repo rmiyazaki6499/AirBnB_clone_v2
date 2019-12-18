@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """This is the place class"""
 from models.base_model import BaseModel, Base
-from models.reviews import Review
+from models.review import Review
 import models
-from sqlalchemy import Column, String, ForeignKey, Integer, Float
+from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
 from os import getenv
 
@@ -73,17 +73,49 @@ class Place(BaseModel, Base):
     )
     amenity_ids = []
 
-    if getenv('HBNB_TYPE_STORAGE') == 'db':
-        reviews = relationship(
-            'Review',
-            backref='place',
-            cascade='all, delete-orphan'
-        )
-    else:
-        @property
-        def reviews(self):
-            review_list = []
-            for id, review in models.storage.all(Review).items():
-                if self.id == review.place.id:
-                    review_list.append(review)
-            return review_list
+    reviews = relationship(
+        'Review',
+        backref='place',
+        cascade='all, delete-orphan'
+    )
+    amenities = relationship(
+        'Amenity',
+        secondary='place_amenity',
+        viewonly='False',
+        backref='place'
+    )
+
+    @property
+    def reviews(self):
+        review_list = []
+        for id, review in models.storage.all(Review).items():
+            if self.id == review.place.id:
+                review_list.append(review)
+        return review_list
+
+    @property
+    def amenities(self):
+        amenities_list = []
+        for id, amenity in models.storage.all(Amenity).items():
+            if self.id == amenity.place.id:
+                amenities_list.append(amenity)
+        return amenities_list
+
+place_amenity = Table(
+    "place_amenity",
+    Base.metadata,
+    Column(
+        'place_id',
+        String(60),
+        ForeignKey('places.id'),
+        primary_key=True,
+        nullable=False
+    ),
+    Column(
+        'amenity_id',
+        String(60),
+        ForeignKey('amenities.id'),
+        primary_key=True,
+        nullable=False
+    )
+)
