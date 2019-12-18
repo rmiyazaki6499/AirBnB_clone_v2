@@ -8,6 +8,26 @@ from sqlalchemy.orm import relationship
 from os import getenv
 
 
+place_amenity = Table(
+    "place_amenity",
+    Base.metadata,
+    Column(
+        'place_id',
+        String(60),
+        ForeignKey('places.id'),
+        primary_key=True,
+        nullable=False
+    ),
+    Column(
+        'amenity_id',
+        String(60),
+        ForeignKey('amenities.id'),
+        primary_key=True,
+        nullable=False
+    )
+)
+
+
 class Place(BaseModel, Base):
     """This is the class for Place
     Attributes:
@@ -71,51 +91,40 @@ class Place(BaseModel, Base):
         Float,
         nullable=True
     )
-    amenity_ids = []
 
     reviews = relationship(
         'Review',
         backref='place',
         cascade='all, delete-orphan'
     )
-    amenities = relationship(
-        'Amenity',
-        secondary='place_amenity',
-        viewonly='False',
-        backref='place'
-    )
 
-    @property
-    def reviews(self):
-        review_list = []
-        for id, review in models.storage.all(Review).items():
-            if self.id == review.place.id:
-                review_list.append(review)
-        return review_list
+    amenity_ids = []
 
-    @property
-    def amenities(self):
-        amenities_list = []
-        for id, amenity in models.storage.all(Amenity).items():
-            if self.id == amenity.place.id:
-                amenities_list.append(amenity)
-        return amenities_list
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        @property
+        def reviews(self):
+            review_list = []
+            for id, review in models.storage.all(Review).items():
+                if self.id == review.place.id:
+                    review_list.append(review)
+            return review_list
 
-place_amenity = Table(
-    "place_amenity",
-    Base.metadata,
-    Column(
-        'place_id',
-        String(60),
-        ForeignKey('places.id'),
-        primary_key=True,
-        nullable=False
-    ),
-    Column(
-        'amenity_id',
-        String(60),
-        ForeignKey('amenities.id'),
-        primary_key=True,
-        nullable=False
-    )
-)
+        amenities = relationship(
+            'Amenity',
+            secondary='place_amenity',
+            viewonly='False',
+            backref='place'
+        )
+    else:
+        @property
+        def amenities(self):
+            amenities_list = []
+            for amenity in amenity_ids:
+                if self.id == amenity.id:
+                    amenities_list.append(amenity)
+            return amenities_list
+
+        @amenities.setter
+        def amenities(self, amenity):
+            if type(amenity).__name__ == 'Amenity':
+                self.amenity_ids
