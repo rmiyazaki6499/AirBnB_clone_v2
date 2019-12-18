@@ -31,18 +31,11 @@ class User(BaseModel, Base):
         String(128),
         nullable=True
     )
-
     places = relationship(
         "Place",
         backref="user",
         cascade="all, delete-orphan"
     )
-
-
-
-
-
-
     reviews = relationship(
         "Review",
         backref="user",

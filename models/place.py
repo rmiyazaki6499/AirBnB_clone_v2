@@ -83,7 +83,7 @@ class Place(BaseModel, Base):
         @property
         def reviews(self):
             review_list = []
-            for id, review in models.storage.all(Review).items():
-                if self.id == review.place.id:
+            for review in models.storage.all(Review).items():
+                if self.id == review.place_id:
                     review_list.append(review)
             return review_list
