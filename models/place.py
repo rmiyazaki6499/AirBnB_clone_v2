@@ -71,6 +71,7 @@ class Place(BaseModel, Base):
         Float,
         nullable=True
     )
+
     amenity_ids = []
 
     reviews = relationship(
@@ -85,21 +86,27 @@ class Place(BaseModel, Base):
         backref='place'
     )
 
-    @property
-    def reviews(self):
-        review_list = []
-        for id, review in models.storage.all(Review).items():
-            if self.id == review.place.id:
-                review_list.append(review)
-        return review_list
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        @property
+        def reviews(self):
+            review_list = []
+            for id, review in models.storage.all(Review).items():
+                if self.id == review.place.id:
+                    review_list.append(review)
+            return review_list
+    else:
+        @property
+        def amenities(self):
+            amenities_list = []
+            for amenity in amenity_ids:
+                if self.id == amenity.id:
+                    amenities_list.append(amenity)
+            return amenities_list
 
-    @property
-    def amenities(self):
-        amenities_list = []
-        for id, amenity in models.storage.all(Amenity).items():
-            if self.id == amenity.place.id:
-                amenities_list.append(amenity)
-        return amenities_list
+        @amenities.setter
+        def amenities(self, amenity):
+            if type(amenity).__name__ == 'Amenity':
+                self.amenity_ids
 
 place_amenity = Table(
     "place_amenity",
