@@ -3,3 +3,6 @@
 
 /* Ignoring test files */
 file.json
+
+/* Ignoring Database files */
+7-dump.sql
