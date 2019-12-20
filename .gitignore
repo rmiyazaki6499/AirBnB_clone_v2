@@ -6,3 +6,4 @@ file.json
 
 /* Ignoring Database files */
 7-dump.sql
+10-dump.sql
